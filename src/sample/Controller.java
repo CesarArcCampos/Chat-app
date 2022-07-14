@@ -1,6 +1,8 @@
 package sample;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -12,6 +14,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -22,6 +25,7 @@ import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -35,19 +39,43 @@ public class Controller implements Initializable {
     private VBox vbox_messages;
     @FXML
     private ScrollPane sp_main;
+    @FXML
+    private Button button_close;
+    @FXML
+    private Button button_connect;
+    @FXML
+    private ToggleButton tbutton;
+
+    @FXML
+    private final StringProperty textValue = new SimpleStringProperty("Connect");
 
     private Server server;
+    private ServerSocket socket;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        try {
-            server = new Server(new ServerSocket(1234));
+        server = new Server();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Failed to create Server.");
-        }
+        tbutton.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                setTextValue("Disconnect");
+                tbutton.requestLayout();
+                try {
+                    socket = new ServerSocket(1234);
+                    server.connectionSocket(socket);
+                    System.out.println("Client is connected to Server");
+                    server.receiveMessageFromClient(vbox_messages);
+                }  catch (IOException e) {
+                    System.out.println("Server is not connected");
+                    //e.printStackTrace();
+                }
+            } else {
+                setTextValue("Connect");
+                tbutton.requestLayout();
+                server.closeSocket(socket);
+            }
+        });
 
         vbox_messages.heightProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -56,14 +84,34 @@ public class Controller implements Initializable {
             }
         });
 
-        server.receiveMessageFromClient(vbox_messages);
-
         tf_message.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent ke) {
                 if (ke.getCode().equals(KeyCode.ENTER)) {
                     setMessageEvent();
                 }
+            }
+        });
+
+        /*button_connect.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                try {
+                    server.connectionSocket(new ServerSocket(1234));
+                    System.out.println("Server is connected");
+                    server.receiveMessageFromClient(vbox_messages);
+                }  catch (IOException e) {
+                    System.out.println("Server is not connected");
+                    //e.printStackTrace();
+                }
+            }
+        });*/
+
+        button_close.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                Platform.exit();
+                System.exit(0);
             }
         });
 
@@ -119,5 +167,13 @@ public class Controller implements Initializable {
             server.sendMessageToClient(messageToSend);
             tf_message.clear();
         }
+    }
+
+    public String getTextValue() {
+        return textValue.get();
+    }
+
+    public void setTextValue(String textValue) {
+        this.textValue.set(textValue);
     }
 }

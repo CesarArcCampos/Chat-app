@@ -13,10 +13,12 @@ public class Server {
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
 
-    public Server(ServerSocket serverSocket) {
+    public void connectionSocket(ServerSocket serverSocket) {
         try {
             this.serverSocket = serverSocket;
+            System.out.println("> Waiting for Client");
             this.socket = serverSocket.accept();
+            System.out.println("> Client has entered");
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         } catch (IOException e) {
@@ -31,7 +33,6 @@ public class Server {
             bufferedWriter.write(messageToClient);
             bufferedWriter.newLine();
             bufferedWriter.flush();
-
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Failed to send message to Client");
@@ -72,6 +73,16 @@ public class Server {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void closeSocket(ServerSocket socket) {
+        if (socket != null) {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
