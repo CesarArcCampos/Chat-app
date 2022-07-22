@@ -24,8 +24,9 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -51,31 +52,54 @@ public class Controller implements Initializable {
 
     private Server server;
     private ServerSocket socket;
+    private boolean flag = true;
+    private URL url;
+    private int port = 1234;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        server = new Server();
+        this.url = url;
 
-        tbutton.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                setTextValue("Disconnect");
-                tbutton.requestLayout();
-                try {
-                    socket = new ServerSocket(1234);
-                    server.connectionSocket(socket);
-                    System.out.println("Client is connected to Server");
-                    server.receiveMessageFromClient(vbox_messages);
-                }  catch (IOException e) {
-                    System.out.println("Server is not connected");
-                    //e.printStackTrace();
+        try {
+            server = new Server();
+        } catch (URISyntaxException | MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        if(flag == true) {
+            tbutton.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue) {
+                    setTextValue("Disconnect");
+                    tbutton.requestLayout();
+                    try {
+                        socket = new ServerSocket(port);
+                        server.connectionSocket(socket, this);
+                        System.out.println("Client is connected to Server");
+                        server.receiveMessageFromClient(vbox_messages);
+                    }  catch (IOException e) {
+                        System.out.println("Server is not connected");
+                    }
+                } else {
+                    setTextValue("Connect");
+                    tbutton.requestLayout();
+                    server.closeSocket(socket);
                 }
-            } else {
-                setTextValue("Connect");
-                tbutton.requestLayout();
-                server.closeSocket(socket);
+            });
+        }
+
+        if (flag == false) {
+            try {
+                socket = new ServerSocket(port);
+                server.connectionSocket(socket, this);
+                System.out.println("Client is connected to Server");
+                server.receiveMessageFromClient(vbox_messages);
+                flag = true;
+            }  catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Server is not connected");
             }
-        });
+        }
 
         vbox_messages.heightProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -92,20 +116,6 @@ public class Controller implements Initializable {
                 }
             }
         });
-
-        /*button_connect.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                try {
-                    server.connectionSocket(new ServerSocket(1234));
-                    System.out.println("Server is connected");
-                    server.receiveMessageFromClient(vbox_messages);
-                }  catch (IOException e) {
-                    System.out.println("Server is not connected");
-                    //e.printStackTrace();
-                }
-            }
-        });*/
 
         button_close.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -175,5 +185,17 @@ public class Controller implements Initializable {
 
     public void setTextValue(String textValue) {
         this.textValue.set(textValue);
+    }
+
+    public VBox getVbox_messages() {
+        return vbox_messages;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+
+    public URL getUrl() {
+        return url;
     }
 }
