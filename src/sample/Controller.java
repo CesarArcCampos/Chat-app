@@ -43,8 +43,6 @@ public class Controller implements Initializable {
     @FXML
     private Button button_close;
     @FXML
-    private Button button_connect;
-    @FXML
     private ToggleButton tbutton;
 
     @FXML
@@ -54,7 +52,7 @@ public class Controller implements Initializable {
     private ServerSocket socket;
     private boolean flag = true;
     private URL url;
-    private int port = 1234;
+    private final int port = 1234;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -67,7 +65,7 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
 
-        if(flag == true) {
+        if(flag) {
             tbutton.selectedProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue) {
                     setTextValue("Disconnect");
@@ -75,10 +73,10 @@ public class Controller implements Initializable {
                     try {
                         socket = new ServerSocket(port);
                         server.connectionSocket(socket, this);
-                        System.out.println("Client is connected to Server");
+                        System.out.println("> Client is connected to Server.");
                         server.receiveMessageFromClient(vbox_messages);
                     }  catch (IOException e) {
-                        System.out.println("Server is not connected");
+                        System.out.println("> Server is not connected.");
                     }
                 } else {
                     setTextValue("Connect");
@@ -88,16 +86,16 @@ public class Controller implements Initializable {
             });
         }
 
-        if (flag == false) {
+        if (!flag) {
             try {
                 socket = new ServerSocket(port);
                 server.connectionSocket(socket, this);
-                System.out.println("Client is connected to Server");
+                System.out.println("> Client is reconnected to Server.");
                 server.receiveMessageFromClient(vbox_messages);
                 flag = true;
             }  catch (IOException e) {
                 e.printStackTrace();
-                System.out.println("Server is not connected");
+                System.out.println("> Server is not connected.");
             }
         }
 

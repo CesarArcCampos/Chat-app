@@ -25,11 +25,10 @@ public class Server {
             this.controller = controller;
             url = controller.getUrl();
             vBox = controller.getVbox_messages();
-
             this.serverSocket = serverSocket;
-            System.out.println("> Waiting for Client");
+            System.out.println("> Waiting for Client...");
             this.socket = serverSocket.accept();
-            System.out.println("> Client has entered");
+            System.out.println("> Client has entered.");
 
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -48,7 +47,7 @@ public class Server {
             bufferedWriter.flush();
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("> Failed to send message to Client");
+            System.out.println("> Failed to send message to Client.");
             closeEverything(socket, bufferedReader, bufferedWriter);
         }
     }
@@ -71,7 +70,7 @@ public class Server {
 
                     } catch (IOException e) {
                         e.printStackTrace();
-                        System.out.println("> Failed to receive message from Client");
+                        System.out.println("> Failed to receive message from Client.");
                         closeEverything(socket, bufferedReader, bufferedWriter);
                         break;
                     }
