@@ -65,6 +65,8 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
 
+        automaticMessages(vbox_messages, "Waiting for Client...");
+
         if(flag) {
             tbutton.selectedProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue) {
@@ -72,6 +74,7 @@ public class Controller implements Initializable {
                     tbutton.requestLayout();
                     try {
                         socket = new ServerSocket(port);
+
                         server.connectionSocket(socket, this);
                         System.out.println("> Client is connected to Server.");
                         server.receiveMessageFromClient(vbox_messages);
@@ -175,6 +178,22 @@ public class Controller implements Initializable {
             server.sendMessageToClient(messageToSend);
             tf_message.clear();
         }
+    }
+
+    public void automaticMessages(VBox vBox, String message) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                HBox hbox = new HBox();
+                hbox.setPadding(new Insets(5,5,5,10));
+
+                Text text = new Text(message);
+                text.setFill(Color.BLUE);
+                TextFlow textFlow = new TextFlow(text);
+                hbox.getChildren().add(textFlow);
+                vBox.getChildren().add(hbox);
+            }
+        });
     }
 
     public String getTextValue() {

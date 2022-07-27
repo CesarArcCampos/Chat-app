@@ -27,8 +27,10 @@ public class Server {
             vBox = controller.getVbox_messages();
             this.serverSocket = serverSocket;
             System.out.println("> Waiting for Client...");
+
             this.socket = serverSocket.accept();
             System.out.println("> Client has entered.");
+            controller.automaticMessages(vBox, "Client is connected to Server!");
 
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -60,6 +62,7 @@ public class Server {
                     try {
                         String messageFromClient = bufferedReader.readLine();
                         if (messageFromClient.equals("Code:1234")) {
+                            controller.automaticMessages(vBox,"Client has disconnected.");
                             System.out.println("> Code:1234 - Client has disconnected.");
                             closeEverything(socket, bufferedReader, bufferedWriter);
                             break;
