@@ -23,6 +23,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
@@ -49,7 +51,7 @@ public class Controller implements Initializable {
     private final StringProperty textValue = new SimpleStringProperty("Connect");
 
     private Server server;
-    private ServerSocket socket;
+    private SSLServerSocket serverSocket;
     private boolean flag = true;
     private URL url;
     private final int port = 1234;
@@ -73,26 +75,32 @@ public class Controller implements Initializable {
                     setTextValue("Disconnect");
                     tbutton.requestLayout();
                     try {
-                        socket = new ServerSocket(port);
+                        //serverSocket = new ServerSocket(port);
+                        serverSocket = (SSLServerSocket) SSLServerSocketFactory.getDefault().createServerSocket(port);
 
-                        server.connectionSocket(socket, this);
+                        server.connectionSocket(serverSocket, this);
                         System.out.println("> Client is connected to Server.");
                         server.receiveMessageFromClient(vbox_messages);
                     }  catch (IOException e) {
+                        e.printStackTrace();
                         System.out.println("> Server is not connected.");
                     }
                 } else {
                     setTextValue("Connect");
                     tbutton.requestLayout();
-                    server.closeSocket(socket);
+                    server.closeSocket(serverSocket);
                 }
             });
         }
 
         if (!flag) {
             try {
-                socket = new ServerSocket(port);
-                server.connectionSocket(socket, this);
+                //serverSocket = new ServerSocket(port);
+
+                serverSocket = (SSLServerSocket) SSLServerSocketFactory.getDefault().createServerSocket(port);
+                //serverSocket.setEnabledCipherSuites(new String[] {"SSL_DH_anon_EXPORT_WITH_DES40_CBC_SHA"});
+
+                server.connectionSocket(serverSocket, this);
                 System.out.println("> Client is reconnected to Server.");
                 server.receiveMessageFromClient(vbox_messages);
                 flag = true;
