@@ -75,9 +75,7 @@ public class Controller implements Initializable {
                     setTextValue("Disconnect");
                     tbutton.requestLayout();
                     try {
-                        //serverSocket = new ServerSocket(port);
                         serverSocket = (SSLServerSocket) SSLServerSocketFactory.getDefault().createServerSocket(port);
-
                         server.connectionSocket(serverSocket, this);
                         System.out.println("> Client is connected to Server.");
                         server.receiveMessageFromClient(vbox_messages);
@@ -95,11 +93,7 @@ public class Controller implements Initializable {
 
         if (!flag) {
             try {
-                //serverSocket = new ServerSocket(port);
-
                 serverSocket = (SSLServerSocket) SSLServerSocketFactory.getDefault().createServerSocket(port);
-                //serverSocket.setEnabledCipherSuites(new String[] {"SSL_DH_anon_EXPORT_WITH_DES40_CBC_SHA"});
-
                 server.connectionSocket(serverSocket, this);
                 System.out.println("> Client is reconnected to Server.");
                 server.receiveMessageFromClient(vbox_messages);
