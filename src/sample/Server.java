@@ -75,7 +75,7 @@ public class Server {
                             Controller.addLabel(messageFromClient, vBox);
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        //e.printStackTrace();
                         System.out.println("> Failed to receive message from Client.");
                         closeEverything(socket, bufferedReader, bufferedWriter);
                         break;
